@@ -109,9 +109,9 @@ export default function Component() {
           </div>
 
           {/* Product Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300">
+              <Card key={product.id} className="group border-0 shadow-none hover:shadow-md transition-all duration-300 bg-white rounded-lg overflow-hidden cursor-pointer p-0">
                 <CardHeader className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
@@ -133,79 +133,49 @@ export default function Component() {
                     )}
                     <Button
                       size="icon"
-                      variant="secondary"
-                      className={`absolute top-2 right-2 bg-white/90 hover:bg-white shadow-sm transition-all duration-200 hover:scale-110 active:scale-95 ${
-                        favorites.includes(product.id) ? "heart-glow shadow-red-500/30" : ""
+                      variant="ghost"
+                      className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-white shadow-sm hover:shadow-md transition-all duration-200 ${
+                        favorites.includes(product.id) ? "text-red-500" : "text-gray-600"
                       }`}
                       onClick={() => toggleFavorite(product.id)}
                     >
                       <Heart
                         className={`h-4 w-4 transition-all duration-300 ${
-                          favorites.includes(product.id)
-                            ? "fill-red-500 text-red-500 scale-110 heart-pulse drop-shadow-sm"
-                            : "text-gray-600 hover:text-red-400"
+                          favorites.includes(product.id) ? "fill-red-500" : ""
                         }`}
                       />
                     </Button>
                   </div>
                 </CardHeader>
 
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg leading-none tracking-tight">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-
-                    {/* Rating */}
-                    <div className="flex items-center space-x-1">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(product.rating)
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "fill-muted text-muted-foreground"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-muted-foreground">({product.reviews})</span>
+                <CardContent className="p-2 sm:p-3">
+                  <div className="space-y-1">
+                    {/* Brand Name */}
+                    <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                      {product.name}
                     </div>
 
-                    {/* Price */}
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold">${product.price}</span>
+                    {/* Description as condition */}
+                    <div className="text-xs text-gray-600 truncate">
+                      {product.description}
+                    </div>
+
+                    {/* Pricing - Vinted Style */}
+                    <div className="pt-1 sm:pt-2">
                       {product.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
+                        <div className="text-xs text-gray-500 line-through">
+                          ${product.originalPrice}
+                        </div>
                       )}
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold text-[#09B1BA]">
+                          ${product.price}
+                        </span>
+                        <span className="text-xs text-gray-500 hidden sm:inline">incl. ⓘ</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
-
-                <CardFooter className="p-4 pt-0">
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleFavorite(product.id)}
-                      className={`flex-shrink-0 transition-all duration-200 hover:scale-105 active:scale-95 ${
-                        favorites.includes(product.id) ? "heart-glow border-red-200 bg-red-50/50" : ""
-                      }`}
-                    >
-                      <Heart
-                        className={`h-4 w-4 transition-all duration-300 ${
-                          favorites.includes(product.id)
-                            ? "fill-red-500 text-red-500 scale-110 heart-pulse drop-shadow-sm"
-                            : "hover:text-red-400"
-                        }`}
-                      />
-                    </Button>
-                    <Button className="flex-1" size="sm">
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Add to Cart
-                    </Button>
-                  </div>
-                </CardFooter>
               </Card>
             ))}
           </div>

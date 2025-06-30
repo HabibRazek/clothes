@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 import {
     Search,
     Menu,
@@ -15,36 +16,40 @@ import {
     Sun,
     Grid3X3,
 } from "lucide-react"
-import Link from "next/link"
+import {Link} from "../../i18n/navigation"
+import {useTranslations, useLocale} from 'next-intl'
+import {useRouter, usePathname} from '../../i18n/navigation'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
+import { UserMenu } from "@/components/auth/user-menu"
 
-const categories = [
-    "Femmes",
-    "Hommes",
-    "Articles de créateurs",
-    "Enfants",
-    "Maison",
-    "Électronique",
-    "Divertissement",
-    "Sport",
-    "À propos",
-    "Notre plateforme",
+// These will be translated in the component
+const categoryKeys = [
+    "women",
+    "men",
+    "designerItems",
+    "kids",
+    "home",
+    "electronics",
+    "entertainment",
+    "sports",
+    "about",
+    "ourPlatform",
 ]
 
-const articleCategories = [
-    "Vêtements femmes",
-    "Chaussures femmes",
-    "Sacs femmes",
-    "Accessoires femmes",
-    "Vêtements hommes",
-    "Chaussures hommes",
-    "Accessoires hommes",
-    "Enfants & bébés",
+const articleCategoryKeys = [
+    "womenClothing",
+    "womenShoes",
+    "womenBags",
+    "womenAccessories",
+    "menClothing",
+    "menShoes",
+    "menAccessories",
+    "kidsBabies",
 ]
 
 // Mega menu data structure
@@ -88,7 +93,7 @@ const megaMenuData = {
 
 // Add this mega menu data structure after the existing megaMenuData
 const categoryMegaMenus = {
-    Femmes: {
+    women: {
         sections: [
             {
                 title: "Vêtements",
@@ -146,7 +151,7 @@ const categoryMegaMenus = {
             },
         ],
     },
-    Hommes: {
+    men: {
         sections: [
             {
                 title: "Vêtements",
@@ -190,7 +195,7 @@ const categoryMegaMenus = {
             },
         ],
     },
-    "Articles de créateurs": {
+    designerItems: {
         sections: [
             {
                 title: "Créateurs Femmes",
@@ -210,7 +215,7 @@ const categoryMegaMenus = {
             },
         ],
     },
-    Enfants: {
+    kids: {
         sections: [
             {
                 title: "Bébé (0-2 ans)",
@@ -257,7 +262,7 @@ const categoryMegaMenus = {
             },
         ],
     },
-    Maison: {
+    home: {
         sections: [
             {
                 title: "Décoration",
@@ -277,7 +282,7 @@ const categoryMegaMenus = {
             },
         ],
     },
-    Électronique: {
+    electronics: {
         sections: [
             {
                 title: "Smartphones & Tablettes",
@@ -306,6 +311,20 @@ export default function Navbar() {
     const [showMegaMenu, setShowMegaMenu] = useState(false)
     const [activeCategoryMenu, setActiveCategoryMenu] = useState<string | null>(null)
 
+    const { data: session } = useSession()
+    const t = useTranslations('Navigation')
+    const tCategories = useTranslations('Categories')
+    const locale = useLocale()
+    const router = useRouter()
+    const pathname = usePathname()
+
+    const categories = categoryKeys.map(key => tCategories(key as any))
+    const articleCategories = articleCategoryKeys.map(key => tCategories(key as any))
+
+    const handleLanguageChange = (newLocale: string) => {
+        router.replace(pathname, {locale: newLocale})
+    }
+
     return (
         <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
             {/* Main Navigation */}
@@ -325,7 +344,7 @@ export default function Navbar() {
                             onMouseLeave={() => setShowMegaMenu(false)}
                         >
                             <Button variant="ghost" className="flex items-center gap-1 text-gray-700 hover:text-[#09B1BA]">
-                                Articles
+                                {t('articles')}
                                 <ChevronDown className="h-4 w-4" />
                             </Button>
 
@@ -383,7 +402,7 @@ export default function Navbar() {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                 <Input
                                     type="text"
-                                    placeholder="Rechercher des articles"
+                                    placeholder={t('search')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="pl-10 bg-gray-50 border-gray-200 focus:border-[#09B1BA] focus:ring-[#09B1BA] rounded-md"
@@ -394,40 +413,75 @@ export default function Navbar() {
 
                     {/* Desktop Action Buttons */}
                     <div className="hidden lg:flex items-center gap-4">
-                        {/* Sign In / Up Links with Border Grouping */}
-                        <div className="border border-[#09B1BA] rounded-md px-3 py-1.5 flex items-center gap-3">
-                            <Link href="/login" className="text-sm text-[#01888f] hover:text-[#09B1BA] transition-colors">
-                                Se connecter
-                            </Link>
-                            <span className="text-[#09B1BA]">|</span>
-                            <Link href="/signup" className="text-sm text-[#01888f] hover:text-[#09B1BA] transition-colors">
-                                S inscrire
-                            </Link>
-                        </div>
+                        {session ? (
+                            /* Logged in user menu */
+                            <>
+                                {/* Sell Button */}
+                                <Link href="/sell">
+                                  <Button className="bg-[#09B1BA] hover:bg-[#078A91] text-white px-6 rounded-md">{t('sell')}</Button>
+                                </Link>
 
-                        {/* Sell Button */}
-                        <Button className="bg-[#09B1BA] hover:bg-[#078A91] text-white px-6 rounded-md">Vends tes articles</Button>
-
-                        {/* Help Icon */}
-                        <Button variant="ghost" size="icon" className="text-gray-600 hover:text-[#09B1BA]">
-                            <HelpCircle className="h-5 w-5" />
-                        </Button>
-
-                        {/* Language Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="flex items-center gap-1 text-gray-600 hover:text-[#09B1BA]">
-                                    <Globe className="h-4 w-4" />
-                                    FR
+                                {/* Help Icon */}
+                                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-[#09B1BA]">
+                                    <HelpCircle className="h-5 w-5" />
                                 </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem>Français</DropdownMenuItem>
-                                <DropdownMenuItem>English</DropdownMenuItem>
-                                <DropdownMenuItem>Español</DropdownMenuItem>
-                                <DropdownMenuItem>Deutsch</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+
+                                {/* Language Dropdown */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="flex items-center gap-1 text-gray-600 hover:text-[#09B1BA]">
+                                            <Globe className="h-4 w-4" />
+                                            {locale.toUpperCase()}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>Français</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+                                {/* User Menu */}
+                                <UserMenu />
+                            </>
+                        ) : (
+                            /* Not logged in - show login/signup */
+                            <>
+                                {/* Sign In / Up Links with Border Grouping */}
+                                <div className="border border-[#09B1BA] rounded-md px-3 py-1.5 flex items-center gap-3">
+                                    <Link href="/login" className="text-sm text-[#01888f] hover:text-[#09B1BA] transition-colors">
+                                        {t('login')}
+                                    </Link>
+                                    <span className="text-[#09B1BA]">|</span>
+                                    <Link href="/signup" className="text-sm text-[#01888f] hover:text-[#09B1BA] transition-colors">
+                                        {t('signup')}
+                                    </Link>
+                                </div>
+
+                                {/* Sell Button */}
+                                <Link href="/sell">
+                                  <Button className="bg-[#09B1BA] hover:bg-[#078A91] text-white px-6 rounded-md">{t('sell')}</Button>
+                                </Link>
+
+                                {/* Help Icon */}
+                                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-[#09B1BA]">
+                                    <HelpCircle className="h-5 w-5" />
+                                </Button>
+
+                                {/* Language Dropdown */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="flex items-center gap-1 text-gray-600 hover:text-[#09B1BA]">
+                                            <Globe className="h-4 w-4" />
+                                            {locale.toUpperCase()}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>Français</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -440,84 +494,104 @@ export default function Navbar() {
                         <SheetContent side="right" className="p-0 w-full sm:w-full">
                             <div className="flex flex-col h-full">
                                 <SheetHeader className="px-6 py-4 border-b border-gray-200">
-                                    <SheetTitle className="text-left text-2xl font-bold text-[#09B1BA]">Menu</SheetTitle>
+                                    <SheetTitle className="text-left text-2xl font-bold text-[#09B1BA]">{t('menu')}</SheetTitle>
                                 </SheetHeader>
                                 <div className="flex-1 overflow-y-auto px-6 py-6">
                                     <div className="space-y-6">
                                         {/* Mobile Search */}
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Rechercher</label>
+                                            <label className="text-sm font-medium text-gray-700">{t('search')}</label>
                                             <div className="relative mt-2">
                                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                                                 <Input
                                                     type="text"
-                                                    placeholder="Rechercher des articles"
+                                                    placeholder={t('search')}
                                                     className="pl-12 py-3 bg-gray-50 border-gray-200 text-base rounded-md"
                                                 />
                                             </div>
                                         </div>
                                         <Separator className="my-6" />
 
-                                        {/* Mobile Auth Links with Borders */}
+                                        {/* Mobile Auth Section */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Compte</h3>
-                                            <div className="border border-gray-300 rounded-md p-2 space-y-2">
-                                                <Link
-                                                    href="/login"
-                                                    className="block py-2 px-3 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded transition-colors text-base"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    Se connecter
-                                                </Link>
-                                                <Link
-                                                    href="/signup"
-                                                    className="block py-2 px-3 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded transition-colors text-base"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    S inscrire
-                                                </Link>
-                                            </div>
+                                            <h3 className="text-lg font-semibold text-gray-900">{t('account')}</h3>
+                                            {session ? (
+                                                /* Logged in user info */
+                                                <div className="border border-gray-300 rounded-md p-4">
+                                                    <UserMenu />
+                                                </div>
+                                            ) : (
+                                                /* Not logged in - show login/signup */
+                                                <div className="border border-gray-300 rounded-md p-2 space-y-2">
+                                                    <Link
+                                                        href="/login"
+                                                        className="block py-2 px-3 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded transition-colors text-base"
+                                                        onClick={() => setIsOpen(false)}
+                                                    >
+                                                        {t('login')}
+                                                    </Link>
+                                                    <Link
+                                                        href="/signup"
+                                                        className="block py-2 px-3 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded transition-colors text-base"
+                                                        onClick={() => setIsOpen(false)}
+                                                    >
+                                                        {t('signup')}
+                                                    </Link>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="py-2">
-                                            <Button className="w-full bg-[#09B1BA] hover:bg-[#078A91] text-white py-3 text-base font-medium rounded-md">
-                                                Vends tes articles
-                                            </Button>
+                                            <Link href="/sell" className="block">
+                                                <Button className="w-full bg-[#09B1BA] hover:bg-[#078A91] text-white py-3 text-base font-medium rounded-md">
+                                                    {t('sell')}
+                                                </Button>
+                                            </Link>
                                         </div>
                                         <Separator className="my-6" />
 
                                         {/* Mobile Categories */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Catégories</h3>
-                                            <div className="grid grid-cols-1 gap-1">
-                                                {categories.map((category) => (
-                                                    <Link
-                                                        key={category}
-                                                        href="#"
-                                                        className="flex items-center py-3 px-4 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded-lg transition-colors text-base"
-                                                        onClick={() => setIsOpen(false)}
-                                                    >
-                                                        {category}
-                                                    </Link>
-                                                ))}
+                                            <h3 className="text-lg font-semibold text-gray-900">{t('categories')}</h3>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {categories.map((category, index) => {
+                                                    const icons = [Shirt, Shirt, Sparkles, Shirt, ShoppingBag, Watch, Sun, Footprints, HelpCircle, Grid3X3];
+                                                    const Icon = icons[index] || Grid3X3;
+                                                    return (
+                                                        <Link
+                                                            key={category}
+                                                            href="#"
+                                                            className="flex flex-col items-center py-4 px-3 text-gray-700 hover:text-[#09B1BA] hover:bg-[#09B1BA]/5 rounded-xl transition-all duration-200 border border-gray-100 hover:border-[#09B1BA]/20 hover:shadow-sm"
+                                                            onClick={() => setIsOpen(false)}
+                                                        >
+                                                            <Icon className="h-6 w-6 mb-2 text-[#09B1BA]" />
+                                                            <span className="text-xs text-center font-medium leading-tight">{category}</span>
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                         <Separator className="my-6" />
 
                                         {/* Mobile Articles */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Articles</h3>
-                                            <div className="grid grid-cols-1 gap-1">
-                                                {articleCategories.map((category) => (
-                                                    <Link
-                                                        key={category}
-                                                        href="#"
-                                                        className="flex items-center py-3 px-4 text-gray-700 hover:text-[#09B1BA] hover:bg-purple-50 rounded-lg transition-colors text-base"
-                                                        onClick={() => setIsOpen(false)}
-                                                    >
-                                                        {category}
-                                                    </Link>
-                                                ))}
+                                            <h3 className="text-lg font-semibold text-gray-900">{t('popularItems')}</h3>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {articleCategories.map((category, index) => {
+                                                    const icons = [Shirt, Footprints, ShoppingBag, Watch, Shirt, Footprints, Watch, Sparkles];
+                                                    const Icon = icons[index] || Shirt;
+                                                    return (
+                                                        <Link
+                                                            key={category}
+                                                            href="#"
+                                                            className="flex flex-col items-center py-3 px-2 text-gray-700 hover:text-[#09B1BA] hover:bg-[#09B1BA]/5 rounded-lg transition-all duration-200 border border-gray-100 hover:border-[#09B1BA]/20"
+                                                            onClick={() => setIsOpen(false)}
+                                                        >
+                                                            <Icon className="h-5 w-5 mb-1 text-[#09B1BA]" />
+                                                            <span className="text-xs text-center font-medium leading-tight">{category}</span>
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -533,14 +607,12 @@ export default function Navbar() {
                                                     className="flex items-center gap-2 text-gray-600 px-4 py-2 rounded-md"
                                                 >
                                                     <Globe className="h-4 w-4" />
-                                                    Français
+                                                    {locale === 'fr' ? 'Français' : 'English'}
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
-                                                <DropdownMenuItem>Français</DropdownMenuItem>
-                                                <DropdownMenuItem>English</DropdownMenuItem>
-                                                <DropdownMenuItem>Español</DropdownMenuItem>
-                                                <DropdownMenuItem>Deutsch</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>Français</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <Button variant="outline" size="icon" className="text-gray-600 hover:text-[#09B1BA] rounded-md">
@@ -558,21 +630,24 @@ export default function Navbar() {
             <div className="hidden lg:block bg-gray-50 border-t border-gray-200 relative">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center space-x-8 h-12 overflow-x-auto">
-                        {categories.map((category) => (
-                            <div
-                                key={category}
-                                className="relative h-full flex items-center"
-                                onMouseEnter={() => setActiveCategoryMenu(category)}
-                                onMouseLeave={() => setActiveCategoryMenu(null)}
-                            >
-                                <Link
-                                    href="#"
-                                    className="text-sm text-gray-600 hover:text-[#09B1BA] transition-colors whitespace-nowrap py-3 border-b-2 border-transparent hover:border-[#09B1BA] h-full flex items-center"
+                        {categoryKeys.map((categoryKey, index) => {
+                            const translatedCategory = categories[index]
+                            return (
+                                <div
+                                    key={categoryKey}
+                                    className="relative h-full flex items-center"
+                                    onMouseEnter={() => setActiveCategoryMenu(categoryKey)}
+                                    onMouseLeave={() => setActiveCategoryMenu(null)}
                                 >
-                                    {category}
-                                </Link>
-                            </div>
-                        ))}
+                                    <Link
+                                        href="#"
+                                        className="text-sm text-gray-600 hover:text-[#09B1BA] transition-colors whitespace-nowrap py-3 border-b-2 border-transparent hover:border-[#09B1BA] h-full flex items-center"
+                                    >
+                                        {translatedCategory}
+                                    </Link>
+                                </div>
+                            )
+                        })}
                     </nav>
                 </div>
 
