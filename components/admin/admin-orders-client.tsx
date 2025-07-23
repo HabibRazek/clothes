@@ -11,45 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Eye, Package, Truck, CheckCircle, XCircle, Clock, User, MapPin, CreditCard, Banknote, Search, Filter } from 'lucide-react'
 import Image from 'next/image'
 import { OrderStatus, PaymentMethod } from '@prisma/client'
-
-interface Order {
-  id: string
-  status: OrderStatus
-  total: number
-  createdAt: Date
-  paymentStatus: string
-  paymentMethod: PaymentMethod
-  deliveryFirstName?: string
-  deliveryLastName?: string
-  deliveryStreet?: string
-  deliveryCity?: string
-  deliveryPostalCode?: string
-  deliveryCountry?: string
-  user: {
-    id: string
-    name: string
-    email: string
-  }
-  items: Array<{
-    id: string
-    quantity: number
-    price: number
-    product: {
-      id: string
-      title: string
-      seller: {
-        id: string
-        user: {
-          name: string
-        }
-      }
-      images: Array<{
-        url: string
-        altText?: string
-      }>
-    }
-  }>
-}
+import { OrderWithRelations as Order } from '@/lib/types/order'
 
 interface AdminOrdersClientProps {
   orders: Order[]
