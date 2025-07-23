@@ -28,27 +28,7 @@ import {
 } from 'lucide-react'
 import { deleteCategory, toggleCategoryStatus } from '@/lib/actions/categories'
 import { CategoryForm } from './category-form'
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  level: number
-  order: number
-  isActive: boolean
-  color: string | null
-  icon: string | null
-  parentId: string | null
-  parent: {
-    name: string
-  } | null
-  children: Category[]
-  _count?: {
-    products: number
-    children: number
-  }
-}
+import { CategoryWithRelations as Category } from '@/lib/types/category'
 
 interface CategoryManagementTableProps {
   categories: Category[]

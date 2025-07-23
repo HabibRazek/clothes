@@ -23,27 +23,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Plus } from 'lucide-react'
 import { createCategory, updateCategory } from '@/lib/actions/categories'
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  level: number
-  order: number
-  isActive: boolean
-  color: string | null
-  icon: string | null
-  parentId: string | null
-  parent: {
-    name: string
-  } | null
-  children: Category[]
-  _count: {
-    products: number
-    children: number
-  }
-}
+import { CategoryWithRelations as Category } from '@/lib/types/category'
 
 interface CategoryFormProps {
   category?: Category

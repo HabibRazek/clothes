@@ -15,30 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Edit, Trash2, Eye, EyeOff, FolderTree, Tag, AlertTriangle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { createCategory, updateCategory, deleteCategory, deleteAllCategories, seedClothingCategories } from '@/lib/actions/categories'
-
-interface Category {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  parentId: string | null
-  icon: string | null
-  color: string | null
-  image: string | null
-  order: number
-  isActive: boolean
-  level: number
-  metaTitle: string | null
-  metaDescription: string | null
-  createdAt: Date
-  updatedAt: Date
-  parent?: Category | null
-  children?: Category[]
-  _count?: {
-    products: number
-    children: number
-  }
-}
+import { CategoryWithRelations as Category } from '@/lib/types/category'
 
 interface CategoryCRUDProps {
   categories: Category[]
