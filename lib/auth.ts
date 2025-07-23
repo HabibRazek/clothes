@@ -34,7 +34,13 @@ export function generateToken(user: AuthUser): string {
 
 export function verifyToken(token: string): AuthUser | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any
+    const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & {
+      id: string
+      email: string
+      firstName: string
+      lastName: string
+      role: string
+    }
     return {
       id: decoded.id,
       email: decoded.email,
@@ -42,7 +48,7 @@ export function verifyToken(token: string): AuthUser | null {
       lastName: decoded.lastName,
       role: decoded.role
     }
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -64,7 +70,7 @@ export async function getUserFromToken(token: string): Promise<AuthUser | null> 
     })
 
     return user
-  } catch (error) {
+  } catch {
     return null
   }
 }

@@ -1,10 +1,8 @@
-import { prisma } from '@/lib/prisma'
-
 export interface AuditLogEntry {
   userId?: string
   action: string
   resource?: string
-  details?: Record<string, any>
+  details?: Record<string, unknown>
   ipAddress?: string
   userAgent?: string
   success: boolean
