@@ -20,19 +20,19 @@ interface Category {
   id: string
   name: string
   slug: string
-  description?: string
-  parentId?: string
-  icon?: string
-  color?: string
-  image?: string
+  description: string | null
+  parentId: string | null
+  icon: string | null
+  color: string | null
+  image: string | null
   order: number
   isActive: boolean
   level: number
-  metaTitle?: string
-  metaDescription?: string
+  metaTitle: string | null
+  metaDescription: string | null
   createdAt: Date
   updatedAt: Date
-  parent?: Category
+  parent?: Category | null
   children?: Category[]
   _count?: {
     products: number
