@@ -3,6 +3,7 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
+import { OrderWithRelations } from '@/lib/types/order'
 
 // Check if user is admin
 export async function requireAdmin() {
@@ -264,7 +265,7 @@ export async function getSellers(page = 1, limit = 10, search = '') {
 }
 
 // Get all orders for admin
-export async function getAllOrders() {
+export async function getAllOrders(): Promise<{ success: true; orders: OrderWithRelations[] } | { success: false; error: string }> {
   await requireAdmin()
 
   try {
