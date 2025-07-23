@@ -9,33 +9,33 @@ import Link from 'next/link'
 import { ArrowLeft, Search } from 'lucide-react'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string
     search?: string
-  }
+  }>
 }
 
 export default async function UsersManagement({ searchParams }: PageProps) {
-  const page = parseInt(searchParams.page || '1')
-  const search = searchParams.search || ''
-  
+  const params = await searchParams
+  const page = parseInt(params.page || '1')
+  const search = params.search || ''
+
   const { users, total, pages, currentPage } = await getUsers(page, 10, search)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/admin">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-2">Manage all users in your marketplace</p>
+    <div>
+      <div className="mb-8">
+        <div className="flex items-center gap-4 mb-4">
+          <Link href="/admin">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
         </div>
+        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+        <p className="text-gray-600 mt-2">Manage all users in your marketplace</p>
+      </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -143,7 +143,6 @@ export default async function UsersManagement({ searchParams }: PageProps) {
             )}
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }

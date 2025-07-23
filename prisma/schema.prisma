@@ -87,6 +87,7 @@ model User {
   orders    Order[]
   reviews   Review[]
   favorites Favorite[]
+  cart      Cart?
 
   @@map("users")
 }
@@ -137,10 +138,24 @@ model Seller {
 
 model Category {
   id          String @id @default(cuid())
-  name        String @unique
+  name        String
   slug        String @unique
   description String?
   parentId    String?
+
+  // Display properties
+  icon        String? // Icon name for UI
+  color       String? // Color code for UI
+  image       String? // Category image URL
+  order       Int     @default(0) // Display order
+  isActive    Boolean @default(true)
+
+  // SEO and metadata
+  metaTitle       String?
+  metaDescription String?
+
+  // Category level (0 = root, 1 = subcategory, etc.)
+  level       Int     @default(0)
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -151,6 +166,7 @@ model Category {
   children Category[] @relation("CategoryHierarchy")
   products Product[]
 
+  @@unique([name, parentId]) // Allow same name in different parent categories
   @@map("categories")
 }
 
@@ -161,16 +177,54 @@ model Product {
   title       String
   description String
   price       Float
+  originalPrice Float?      // For showing discounts
   condition   ProductCondition
+
+  // Basic attributes
   size        String?
   brand       String?
   color       String?
   material    String?
 
-  // Product status
+  // Clothing specific attributes
+  gender      Gender?       // For clothing categories
+  season      Season?       // Spring, Summer, Fall, Winter
+  style       String?       // Casual, Formal, Sport, etc.
+
+  // Shoes specific attributes
+  shoeSize    String?       // EU, US, UK sizes
+  heelHeight  String?       // For women's shoes
+
+  // Bags & Accessories specific
+  bagType     String?       // Handbag, Backpack, Clutch, etc.
+  dimensions  String?       // Length x Width x Height
+
+  // Beauty specific attributes
+  skinType    String?       // Dry, Oily, Combination, Sensitive
+  shadeColor  String?       // For makeup products
+  expiryDate  DateTime?     // For beauty products
+
+  // Product status and metrics
   status      ProductStatus @default(ACTIVE)
   isPromoted  Boolean       @default(false)
+  isFeatured  Boolean       @default(false)
   views       Int           @default(0)
+  likes       Int           @default(0)
+
+  // Location and shipping
+  location    String?       // City/Region
+  country     String?       // Country
+  shippingCost Float?       // Shipping cost
+  canDeliver  Boolean       @default(true)
+  canPickup   Boolean       @default(false)
+
+  // SEO and tags
+  tags        String[]      @default([])
+
+  // Additional product details
+  weight      Float?        // Product weight in kg
+  measurements String?      // Detailed measurements
+  keywords    String[]      @default([])
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -183,6 +237,7 @@ model Product {
   orderItems OrderItem[]
   reviews   Review[]
   favorites Favorite[]
+  cartItems CartItem[]
 
   @@map("products")
 }
@@ -206,8 +261,16 @@ model ProductImage {
 model Order {
   id        String      @id @default(cuid())
   userId    String
-  addressId String
+  addressId String?
   status    OrderStatus @default(PENDING)
+
+  // Delivery information for orders without saved address
+  deliveryFirstName String?
+  deliveryLastName  String?
+  deliveryStreet    String?
+  deliveryCity      String?
+  deliveryPostalCode String?
+  deliveryCountry   String?
 
   // Order totals
   subtotal     Float
@@ -216,7 +279,7 @@ model Order {
   total        Float
 
   // Payment information
-  paymentMethod String?
+  paymentMethod PaymentMethod @default(CARD)
   paymentStatus PaymentStatus @default(PENDING)
 
   // Timestamps
@@ -225,7 +288,7 @@ model Order {
 
   // Relations
   user      User        @relation(fields: [userId], references: [id])
-  address   Address     @relation(fields: [addressId], references: [id])
+  address   Address?    @relation(fields: [addressId], references: [id])
   items     OrderItem[]
 
   @@map("orders")
@@ -246,6 +309,39 @@ model OrderItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@map("order_items")
+}
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int    @default(1)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId]) // Prevent duplicate products in same cart
+  @@map("cart_items")
 }
 
 model Review {
@@ -297,11 +393,11 @@ enum SellerType {
 }
 
 enum ProductCondition {
-  NEW
-  LIKE_NEW
+  NEW_WITH_TAGS
+  NEW_WITHOUT_TAGS
+  VERY_GOOD
   GOOD
-  FAIR
-  POOR
+  SATISFACTORY
 }
 
 enum ProductStatus {
@@ -325,4 +421,28 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  PAYPAL
+  CASH_ON_DELIVERY
+  BANK_TRANSFER
+}
+
+enum Gender {
+  WOMEN
+  MEN
+  UNISEX
+  KIDS_GIRLS
+  KIDS_BOYS
+  BABY
+}
+
+enum Season {
+  SPRING
+  SUMMER
+  FALL
+  WINTER
+  ALL_SEASON
 }

@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/actions/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Package, TrendingUp, Users, DollarSign } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -92,12 +93,16 @@ export default async function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full bg-[#09B1BA] hover:bg-[#078A91]">
-                Add Your First Product
-              </Button>
-              <Button variant="outline" className="w-full">
-                Set Up Store Profile
-              </Button>
+              <Link href="/dashboard/products/new">
+                <Button className="w-full bg-[#09B1BA] hover:bg-[#078A91]">
+                  Add Your First Product
+                </Button>
+              </Link>
+              <Link href="/dashboard/products">
+                <Button variant="outline" className="w-full">
+                  Manage Products
+                </Button>
+              </Link>
               <Button variant="outline" className="w-full">
                 View Analytics
               </Button>

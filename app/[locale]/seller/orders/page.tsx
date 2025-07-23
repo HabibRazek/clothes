@@ -1,12 +1,13 @@
-import { getAllOrders } from '@/lib/actions/admin'
+import { getSellerOrders } from '@/lib/actions/orders'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Suspense } from 'react'
-import { Package, Clock, CheckCircle, XCircle, Truck, Euro, Users } from 'lucide-react'
-import AdminOrdersClient from '@/components/admin/admin-orders-client'
+import { Package, Clock, CheckCircle, XCircle, Truck } from 'lucide-react'
+import SellerOrdersClient from '@/components/seller/seller-orders-client'
 
-export default async function AdminOrders() {
-  const result = await getAllOrders()
+export default async function SellerOrders() {
+  const result = await getSellerOrders()
   
   if (!result.success) {
     return (
@@ -31,20 +32,15 @@ export default async function AdminOrders() {
     .filter(o => o.status === 'DELIVERED')
     .reduce((sum, order) => sum + order.total, 0)
 
-  // Get unique sellers
-  const uniqueSellers = new Set(orders.flatMap(o => 
-    o.items.map(item => item.product.seller.id)
-  )).size
-
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Gestion des Commandes</h1>
-        <p className="text-gray-600 mt-2">Supervisez toutes les commandes de la plateforme</p>
+        <h1 className="text-3xl font-bold text-gray-900">Mes Commandes</h1>
+        <p className="text-gray-600 mt-2">Gérez vos commandes et suivez vos ventes</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
@@ -105,25 +101,11 @@ export default async function AdminOrders() {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Vendeurs Actifs</p>
-                <p className="text-2xl font-bold text-indigo-600">{uniqueSellers}</p>
-              </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-indigo-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-600">Chiffre d'Affaires</p>
                 <p className="text-2xl font-bold text-green-600">€{totalRevenue.toFixed(2)}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Euro className="w-6 h-6 text-green-600" />
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -135,16 +117,16 @@ export default async function AdminOrders() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Toutes les Commandes</CardTitle>
+              <CardTitle>Liste des Commandes</CardTitle>
               <CardDescription>
-                Gérez et supervisez toutes les commandes de la plateforme
+                Gérez le statut de vos commandes
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <Suspense fallback={<div>Chargement...</div>}>
-            <AdminOrdersClient orders={orders} />
+            <SellerOrdersClient orders={orders} />
           </Suspense>
         </CardContent>
       </Card>

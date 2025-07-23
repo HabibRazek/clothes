@@ -1,22 +1,19 @@
 import { getAdminStats } from '@/lib/actions/admin'
-import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/actions/auth'
-import AdminDashboardLayout from '@/components/admin/admin-dashboard-layout'
+import DashboardContent from '@/components/admin/dashboard-content'
 
 export default async function AdminDashboard() {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  if (user.role !== 'ADMIN') {
-    redirect('/')
-  }
-
   const stats = await getAdminStats()
 
   return (
-    <AdminDashboardLayout stats={stats} />
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-2">Welcome back, manage your marketplace</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto">
+        <DashboardContent stats={stats} />
+      </div>
+    </div>
   )
 }

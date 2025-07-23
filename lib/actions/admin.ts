@@ -117,13 +117,41 @@ export async function getAdminStats() {
 export async function updateUserRole(userId: string, role: 'BUYER' | 'SELLER' | 'ADMIN') {
   await requireAdmin()
 
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: { role },
-    include: { seller: true }
-  })
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // Update user role
+      const user = await tx.user.update({
+        where: { id: userId },
+        data: { role },
+        include: { seller: true }
+      })
 
-  return user
+      // If changing to SELLER and no seller profile exists, create one
+      if (role === 'SELLER' && !user.seller) {
+        await tx.seller.create({
+          data: {
+            userId: user.id,
+            storeName: `${user.firstName} ${user.lastName}'s Store`,
+            storeDescription: 'Welcome to my store!',
+            sellerType: 'INDIVIDUAL'
+          }
+        })
+
+        // Fetch updated user with seller profile
+        return await tx.user.findUnique({
+          where: { id: userId },
+          include: { seller: true }
+        })
+      }
+
+      return user
+    })
+
+    return result
+  } catch (error) {
+    console.error('Error updating user role:', error)
+    throw new Error('Failed to update user role')
+  }
 }
 
 // Delete user
@@ -135,6 +163,46 @@ export async function deleteUser(userId: string) {
   })
 
   return { success: true }
+}
+
+// Create missing seller profiles for users with SELLER role
+export async function createMissingSellerProfiles() {
+  await requireAdmin()
+
+  try {
+    // Find users with SELLER role but no seller profile
+    const sellersWithoutProfile = await prisma.user.findMany({
+      where: {
+        role: 'SELLER',
+        seller: null
+      }
+    })
+
+    const results = []
+    for (const user of sellersWithoutProfile) {
+      const seller = await prisma.seller.create({
+        data: {
+          userId: user.id,
+          storeName: `${user.firstName} ${user.lastName}'s Store`,
+          storeDescription: 'Welcome to my store!',
+          sellerType: 'INDIVIDUAL'
+        }
+      })
+      results.push(seller)
+    }
+
+    return {
+      success: true,
+      created: results.length,
+      sellers: results
+    }
+  } catch (error) {
+    console.error('Error creating missing seller profiles:', error)
+    return {
+      success: false,
+      error: 'Failed to create missing seller profiles'
+    }
+  }
 }
 
 // Verify seller
@@ -192,5 +260,53 @@ export async function getSellers(page = 1, limit = 10, search = '') {
     total,
     pages: Math.ceil(total / limit),
     currentPage: page
+  }
+}
+
+// Get all orders for admin
+export async function getAllOrders() {
+  await requireAdmin()
+
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  include: {
+                    user: {
+                      select: {
+                        name: true
+                      }
+                    }
+                  }
+                },
+                images: {
+                  take: 1,
+                  orderBy: { order: 'asc' }
+                }
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+
+    return { success: true, orders }
+  } catch (error) {
+    console.error('Error fetching all orders:', error)
+    return { success: false, error: 'Failed to fetch orders' }
   }
 }

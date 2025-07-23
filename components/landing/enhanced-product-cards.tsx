@@ -3,17 +3,72 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Heart, Star, Eye, MessageCircle, Share2, MapPin } from "lucide-react"
-import { useState } from "react"
-import {useTranslations} from 'next-intl'
+import { Heart, Star, Eye, MessageCircle, Share2, MapPin, ShoppingCart } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useTranslations } from 'next-intl'
+import { getPublicProducts } from '@/lib/actions/products'
+import { addToCart } from '@/lib/actions/cart'
+import Link from 'next/link'
+import Image from 'next/image'
+
+interface Product {
+  id: string
+  title: string
+  price: number
+  originalPrice?: number
+  condition: string
+  brand?: string
+  size?: string
+  location?: string
+  views: number
+  likes: number
+  createdAt: Date
+  category: {
+    name: string
+  }
+  seller: {
+    user: {
+      name: string
+      image?: string
+    }
+  }
+  images: Array<{
+    url: string
+    altText?: string
+  }>
+  _count: {
+    reviews: number
+    favorites: number
+  }
+}
 
 export default function EnhancedProductCards() {
-  const [favorites, setFavorites] = useState<number[]>([])
+  const [favorites, setFavorites] = useState<string[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [addingToCart, setAddingToCart] = useState<Set<string>>(new Set())
   const t = useTranslations('HomePage')
   const tProduct = useTranslations('ProductCard')
   const tCommon = useTranslations('Common')
 
-  const toggleFavorite = (id: number) => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const result = await getPublicProducts({ limit: 8 })
+        if (result.success) {
+          setProducts(result.products as Product[])
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
+  const toggleFavorite = (id: string) => {
     setFavorites(prev =>
       prev.includes(id)
         ? prev.filter(fav => fav !== id)
@@ -21,156 +76,66 @@ export default function EnhancedProductCards() {
     )
   }
 
-  const products = [
-    {
-      id: 1,
-      image: null,
-      title: "Pull en laine mérinos",
-      brand: "COS",
-      size: "M",
-      condition: "Neuf avec étiquettes",
-      price: 45.00,
-      originalPrice: 89.00,
-      likes: 32,
-      views: 156,
-      messages: 8,
-      isPromoted: true,
-      location: "Paris",
-      postedTime: "il y a 2h",
-      seller: {
-        name: "Camille",
-        avatar: null,
-        rating: 4.9,
-        reviews: 234,
-        isVerified: true
-      },
-      tags: ["Tendance", "Éco-responsable"]
-    },
-    {
-      id: 2,
-      image: null,
-      title: "Robe midi fleurie",
-      brand: "& Other Stories",
-      size: "S",
-      condition: "Très bon état",
-      price: 28.00,
-      originalPrice: 65.00,
-      likes: 67,
-      views: 289,
-      messages: 15,
-      isPromoted: false,
-      location: "Lyon",
-      postedTime: "il y a 5h",
-      seller: {
-        name: "Léa",
-        avatar: null,
-        rating: 4.7,
-        reviews: 89,
-        isVerified: true
-      },
-      tags: ["Vintage", "Printemps"]
-    },
-    {
-      id: 3,
-      image: null,
-      title: "Blazer noir classique",
-      brand: "Mango",
-      size: "L",
-      condition: "Bon état",
-      price: 35.00,
-      originalPrice: 79.00,
-      likes: 24,
-      views: 98,
-      messages: 3,
-      isPromoted: false,
-      location: "Marseille",
-      postedTime: "il y a 1j",
-      seller: {
-        name: "Sarah",
-        avatar: null,
-        rating: 4.8,
-        reviews: 156,
-        isVerified: false
-      },
-      tags: ["Bureau", "Classique"]
-    },
-    {
-      id: 4,
-      image: null,
-      title: "Jean mom fit vintage",
-      brand: "Levi's",
-      size: "28",
-      condition: "Très bon état",
-      price: 52.00,
-      originalPrice: 95.00,
-      likes: 89,
-      views: 445,
-      messages: 22,
-      isPromoted: true,
-      location: "Bordeaux",
-      postedTime: "il y a 3h",
-      seller: {
-        name: "Emma",
-        avatar: null,
-        rating: 4.9,
-        reviews: 312,
-        isVerified: true
-      },
-      tags: ["Vintage", "Denim"]
-    },
-    {
-      id: 5,
-      image: null,
-      title: "Bottines en cuir",
-      brand: "Dr. Martens",
-      size: "39",
-      condition: "Bon état",
-      price: 75.00,
-      originalPrice: 150.00,
-      likes: 43,
-      views: 234,
-      messages: 12,
-      isPromoted: false,
-      location: "Toulouse",
-      postedTime: "il y a 6h",
-      seller: {
-        name: "Julie",
-        avatar: null,
-        rating: 4.6,
-        reviews: 78,
-        isVerified: true
-      },
-      tags: ["Cuir", "Hiver"]
-    },
-    {
-      id: 6,
-      image: null,
-      title: "Sac bandoulière",
-      brand: "Sézane",
-      size: "Unique",
-      condition: "Neuf avec étiquettes",
-      price: 120.00,
-      originalPrice: 195.00,
-      likes: 156,
-      views: 678,
-      messages: 34,
-      isPromoted: true,
-      location: "Nice",
-      postedTime: "il y a 1h",
-      seller: {
-        name: "Marine",
-        avatar: null,
-        rating: 5.0,
-        reviews: 445,
-        isVerified: true
-      },
-      tags: ["Luxe", "Cuir"]
+  const handleAddToCart = async (productId: string) => {
+    setAddingToCart(prev => new Set(prev).add(productId))
+    try {
+      const result = await addToCart(productId, 1)
+      if (result.success) {
+        // Show success message or update cart count
+        alert('Product added to cart!')
+      } else {
+        alert(result.error || 'Failed to add to cart')
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+      alert('Failed to add to cart')
+    } finally {
+      setAddingToCart(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(productId)
+        return newSet
+      })
     }
-  ]
+  }
 
   const discountPercentage = (original: number, current: number) => {
     return Math.round(((original - current) / original) * 100)
   }
+
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+    if (diffInHours < 1) return 'il y a moins d\'1h'
+    if (diffInHours < 24) return `il y a ${diffInHours}h`
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays === 1) return 'il y a 1j'
+    return `il y a ${diffInDays}j`
+  }
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {[...Array(8)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <div className="w-full h-48 sm:h-64 bg-gray-200 rounded-t-lg"></div>
+                <CardContent className="p-2 sm:p-3">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
 
   return (
     <section className="py-16 bg-white">
@@ -198,67 +163,110 @@ export default function EnhancedProductCards() {
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {products.map((product) => (
-            <Card key={product.id} className="group border-0 shadow-none hover:shadow-md transition-all duration-300 bg-white rounded-lg overflow-hidden cursor-pointer p-0">
-              <div className="relative">
-                <div className="w-full h-48 sm:h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-t-lg">
-                  <div className="text-center text-gray-400">
-                    <div className="text-4xl mb-2">📷</div>
-                    <div className="text-sm font-medium">Product Image</div>
-                    <div className="text-xs">300x256px</div>
-                  </div>
-                </div>
-
-                {/* Heart Button - Vinted Style */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-white shadow-sm hover:shadow-md transition-all duration-200 ${
-                    favorites.includes(product.id) ? "text-red-500" : "text-gray-600"
-                  }`}
-                  onClick={() => toggleFavorite(product.id)}
-                >
-                  <Heart
-                    className={`h-4 w-4 transition-all duration-300 ${
-                      favorites.includes(product.id) ? "fill-red-500" : ""
-                    }`}
-                  />
-                </Button>
-
-                {/* Likes Counter - Bottom Right */}
-                <div className="absolute bottom-2 right-2 text-xs text-gray-600 font-medium">
-                  {product.likes}
-                </div>
-              </div>
-
-              <CardContent className="p-2 sm:p-3">
-                <div className="space-y-1">
-                  {/* Brand Name */}
-                  <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                    {product.brand}
-                  </div>
-
-                  {/* Size and Condition */}
-                  <div className="text-xs text-gray-600 truncate">
-                    {product.size} / {product.size} • {product.condition}
-                  </div>
-
-                  {/* Pricing - Vinted Style */}
-                  <div className="pt-1 sm:pt-2">
-                    {product.originalPrice && (
-                      <div className="text-xs text-gray-500 line-through">
-                        {product.originalPrice.toFixed(2)} €
+            <Link key={product.id} href={`/products/${product.id}`}>
+              <Card className="group border-0 shadow-none hover:shadow-md transition-all duration-300 bg-white rounded-lg overflow-hidden cursor-pointer p-0">
+                <div className="relative">
+                  {product.images && product.images.length > 0 ? (
+                    <div className="w-full h-48 sm:h-64 relative rounded-t-lg overflow-hidden">
+                      <Image
+                        src={product.images[0].url}
+                        alt={product.images[0].altText || product.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 sm:h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-t-lg">
+                      <div className="text-center text-gray-400">
+                        <div className="text-4xl mb-2">📷</div>
+                        <div className="text-sm font-medium">Product Image</div>
+                        <div className="text-xs">300x256px</div>
                       </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm font-bold text-[#09B1BA]">
-                        {product.price.toFixed(2)} €
-                      </span>
-                      <span className="text-xs text-gray-500 hidden sm:inline">incl. ⓘ</span>
+                    </div>
+                  )}
+
+                  {/* Heart Button - Vinted Style */}
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-white shadow-sm hover:shadow-md transition-all duration-200 ${
+                      favorites.includes(product.id) ? "text-red-500" : "text-gray-600"
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      toggleFavorite(product.id)
+                    }}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-all duration-300 ${
+                        favorites.includes(product.id) ? "fill-red-500" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  {/* Likes Counter - Bottom Right */}
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-600 font-medium">
+                    {product._count.favorites}
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <Button
+                    size="sm"
+                    className="absolute bottom-2 left-2 bg-[#09B1BA] hover:bg-[#078A91] text-white opacity-0 group-hover:opacity-100 transition-all duration-300"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleAddToCart(product.id)
+                    }}
+                    disabled={addingToCart.has(product.id)}
+                  >
+                    <ShoppingCart className="h-3 w-3 mr-1" />
+                    {addingToCart.has(product.id) ? 'Adding...' : 'Acheter'}
+                  </Button>
+                </div>
+
+                <CardContent className="p-2 sm:p-3">
+                  <div className="space-y-1">
+                    {/* Title */}
+                    <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                      {product.title}
+                    </div>
+
+                    {/* Brand and Size */}
+                    <div className="text-xs text-gray-600 truncate">
+                      {product.brand && `${product.brand} • `}
+                      {product.size && `Taille ${product.size} • `}
+                      {product.condition}
+                    </div>
+
+                    {/* Category and Location */}
+                    <div className="text-xs text-gray-500 truncate">
+                      {product.category.name}
+                      {product.location && ` • ${product.location}`}
+                    </div>
+
+                    {/* Pricing - Vinted Style */}
+                    <div className="pt-1 sm:pt-2">
+                      {product.originalPrice && (
+                        <div className="text-xs text-gray-500 line-through">
+                          {product.originalPrice.toFixed(2)} €
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-bold text-[#09B1BA]">
+                          {product.price.toFixed(2)} €
+                        </span>
+                        <span className="text-xs text-gray-500 hidden sm:inline">incl. ⓘ</span>
+                      </div>
+                    </div>
+
+                    {/* Seller and Time */}
+                    <div className="text-xs text-gray-500 truncate pt-1">
+                      Par {product.seller.user.name} • {formatTimeAgo(new Date(product.createdAt))}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
