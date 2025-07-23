@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { OrderWithRelations } from '@/lib/types/order'
+import { AdminStats, UserWithSeller, OrderWithUserAndItems } from '@/lib/types/admin'
 
 // Check if user is admin
 export async function requireAdmin() {
@@ -67,7 +68,7 @@ export async function getUsers(page = 1, limit = 10, search = '') {
 }
 
 // Get dashboard stats
-export async function getAdminStats() {
+export async function getAdminStats(): Promise<AdminStats> {
   await requireAdmin()
 
   const [
@@ -76,8 +77,8 @@ export async function getAdminStats() {
     totalBuyers,
     totalProducts,
     totalOrders,
-    recentUsers,
-    recentOrders
+    recentUsersRaw,
+    recentOrdersRaw
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { role: 'SELLER' } }),
@@ -102,6 +103,28 @@ export async function getAdminStats() {
       }
     })
   ])
+
+  // Format users for dashboard component
+  const recentUsers = recentUsersRaw.map(user => ({
+    id: user.id,
+    firstName: user.firstName || 'N/A',
+    lastName: user.lastName || 'N/A',
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt.toISOString()
+  }))
+
+  // Format orders for dashboard component
+  const recentOrders = recentOrdersRaw.map(order => ({
+    id: order.id,
+    total: order.total,
+    status: order.status,
+    user: {
+      name: order.user.name || 'N/A',
+      email: order.user.email
+    },
+    createdAt: order.createdAt.toISOString()
+  }))
 
   return {
     totalUsers,

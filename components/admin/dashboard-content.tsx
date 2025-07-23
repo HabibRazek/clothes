@@ -18,31 +18,10 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { createMissingSellerProfiles } from '@/lib/actions/admin'
+import { AdminStats } from '@/lib/types/admin'
 
 interface DashboardContentProps {
-  stats: {
-    totalUsers: number
-    totalSellers: number
-    totalProducts: number
-    totalOrders: number
-    recentUsers: Array<{
-      id: string
-      firstName: string
-      lastName: string
-      email: string
-      role: string
-      createdAt: string
-    }>
-    recentOrders: Array<{
-      id: string
-      total: number
-      status: string
-      user: {
-        firstName: string
-        lastName: string
-      }
-    }>
-  }
+  stats: AdminStats
 }
 
 export default function DashboardContent({ stats }: DashboardContentProps) {
