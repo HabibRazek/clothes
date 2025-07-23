@@ -8,6 +8,9 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Plus, Search, Package } from 'lucide-react'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   searchParams: Promise<{
     page?: string

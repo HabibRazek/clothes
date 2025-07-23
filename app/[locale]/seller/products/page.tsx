@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { Plus, Package, Eye, Edit, Trash2 } from 'lucide-react'
 import { SellerProductCRUD } from '@/components/seller/seller-product-crud'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 // Mock products data - replace with real data from database
 const sellerProducts = [
   {

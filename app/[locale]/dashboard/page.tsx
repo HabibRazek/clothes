@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Package, TrendingUp, Users, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const user = await getCurrentUser()
 

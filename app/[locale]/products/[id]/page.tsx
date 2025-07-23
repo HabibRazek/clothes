@@ -4,6 +4,9 @@ import ProductDetailClient from '@/components/products/product-detail-client'
 import Navbar from '@/components/navigation/navbar'
 import Footer from '@/components/layout/footer'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 interface ProductPageProps {
   params: Promise<{
     id: string

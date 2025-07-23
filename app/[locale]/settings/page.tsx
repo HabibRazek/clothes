@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import SettingsForm from '@/components/settings/settings-form'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const session = await auth()
 

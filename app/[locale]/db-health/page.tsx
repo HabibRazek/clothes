@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, XCircle, Database, Users, Package, ShoppingCart, FolderTree } from 'lucide-react'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function DatabaseHealthPage() {
   const connectionResult = await checkDatabaseConnection()
   const statsResult = await getDatabaseStats()

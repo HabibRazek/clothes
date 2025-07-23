@@ -5,6 +5,9 @@ import CartClient from '@/components/cart/cart-client'
 import Navbar from '@/components/navigation/navbar'
 import Footer from '@/components/layout/footer'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function CartPage() {
   const user = await getCurrentUser()
   

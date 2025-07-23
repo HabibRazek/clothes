@@ -5,6 +5,9 @@ import { redirect } from 'next/navigation'
 import CheckoutClient from '@/components/checkout/checkout-client'
 import Navbar from '@/components/navigation/navbar'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 interface CheckoutPageProps {
   searchParams: Promise<{
     productId?: string

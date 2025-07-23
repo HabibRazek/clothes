@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { ArrowLeft, Plus, FolderTree, Edit, Trash2, Eye } from 'lucide-react'
 import { CategoryCRUD } from '@/components/admin/category-crud'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function CategoriesStandalone() {
   const categories = await getCategories()
   

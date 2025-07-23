@@ -5,6 +5,9 @@ import { ProductForm } from '@/components/seller/product-form'
 import Link from 'next/link'
 import { ArrowLeft, Plus } from 'lucide-react'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function NewProductPage() {
   const categories = await getRootCategories()
 

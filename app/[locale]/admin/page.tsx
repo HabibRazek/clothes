@@ -1,6 +1,9 @@
 import { getAdminStats } from '@/lib/actions/admin'
 import DashboardContent from '@/components/admin/dashboard-content'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboard() {
   const stats = await getAdminStats()
 

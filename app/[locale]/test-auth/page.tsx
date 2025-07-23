@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { SessionSecurity } from '@/lib/security/session-security'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function TestAuthPage() {
   const session = await auth()
   const sessionInfo = await SessionSecurity.getCurrentSession()

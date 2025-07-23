@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { ArrowLeft, Edit } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{
     id: string

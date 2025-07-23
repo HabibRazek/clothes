@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Navbar from '@/components/navigation/navbar'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function AuthTestPage() {
   const session = await auth()
 

@@ -6,6 +6,9 @@ import { Suspense } from 'react'
 import { Package, Clock, CheckCircle, XCircle, Truck } from 'lucide-react'
 import SellerOrdersClient from '@/components/seller/seller-orders-client'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function SellerOrders() {
   const result = await getSellerOrders()
   

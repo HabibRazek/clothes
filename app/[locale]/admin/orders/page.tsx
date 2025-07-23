@@ -5,6 +5,9 @@ import { Suspense } from 'react'
 import { Package, Clock, CheckCircle, XCircle, Truck, Euro, Users } from 'lucide-react'
 import AdminOrdersClient from '@/components/admin/admin-orders-client'
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic'
+
 export default async function AdminOrders() {
   const result = await getAllOrders()
   
