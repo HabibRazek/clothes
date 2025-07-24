@@ -22,7 +22,12 @@
 - **Fix**: Created `CheckoutProduct` interface and data transformation
 - **Files**: `lib/types/product.ts`, `lib/actions/products.ts`, `components/checkout/checkout-client.tsx`
 
-### 5. **Category Types** ✅
+### 5. **Checkout User Types** ✅
+- **Issue**: User `name` field type mismatch (null vs undefined)
+- **Fix**: Added user data transformation in checkout page
+- **Files**: `app/[locale]/checkout/page.tsx`
+
+### 6. **Category Types** ✅
 - **Issue**: Manual interfaces didn't match Prisma-generated types
 - **Fix**: Created shared `CategoryWithRelations` type
 - **Files**: `lib/types/category.ts`, `lib/actions/categories.ts`, `components/admin/categories-client.tsx`

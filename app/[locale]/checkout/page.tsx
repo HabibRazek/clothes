@@ -49,10 +49,17 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
       }))
     }
 
+    // Format user for checkout component
+    const checkoutUser = {
+      id: user.id,
+      name: user.name || undefined, // Convert null to undefined
+      email: user.email
+    }
+
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <CheckoutClient product={checkoutProduct} user={user} />
+        <CheckoutClient product={checkoutProduct} user={checkoutUser} />
       </div>
     )
   }
@@ -64,10 +71,17 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     redirect('/cart')
   }
 
+  // Format user for checkout component
+  const checkoutUser = {
+    id: user.id,
+    name: user.name || undefined, // Convert null to undefined
+    email: user.email
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <CheckoutClient cart={cartResult.cart} user={user} />
+      <CheckoutClient cart={cartResult.cart} user={checkoutUser} />
     </div>
   )
 }
