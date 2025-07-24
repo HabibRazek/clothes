@@ -11,34 +11,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { updateCartItemQuantity, removeFromCart, clearCart } from '@/lib/actions/cart'
 import { useRouter } from 'next/navigation'
-
-interface CartItem {
-  id: string
-  quantity: number
-  product: {
-    id: string
-    title: string
-    price: number
-    condition: string
-    seller: {
-      user: {
-        name: string
-      }
-    }
-    images: Array<{
-      url: string
-      altText?: string
-    }>
-  }
-}
-
-interface Cart {
-  id: string
-  items: CartItem[]
-}
+import { CartWithItems } from '@/lib/types/cart'
 
 interface CartClientProps {
-  cart: Cart
+  cart: CartWithItems
 }
 
 export default function CartClient({ cart }: CartClientProps) {

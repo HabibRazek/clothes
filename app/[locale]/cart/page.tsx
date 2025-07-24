@@ -16,7 +16,7 @@ export default async function CartPage() {
   }
 
   const result = await getOrCreateCart()
-  
+
   if (!result.success) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -32,6 +32,7 @@ export default async function CartPage() {
     )
   }
 
+  // TypeScript now knows result.cart exists because result.success is true
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />

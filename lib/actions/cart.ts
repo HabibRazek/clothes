@@ -3,9 +3,10 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from './auth'
 import { revalidatePath } from 'next/cache'
+import { CartActionResult, CartWithItems } from '@/lib/types/cart'
 
 // Get or create user's cart
-export async function getOrCreateCart() {
+export async function getOrCreateCart(): Promise<CartActionResult> {
   const user = await getCurrentUser()
   
   if (!user) {
