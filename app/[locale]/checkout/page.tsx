@@ -30,10 +30,29 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
       redirect('/')
     }
 
+    // Format product for checkout component
+    const checkoutProduct = {
+      id: result.product.id,
+      title: result.product.title,
+      price: result.product.price,
+      shippingCost: result.product.shippingCost,
+      canDeliver: result.product.canDeliver,
+      canPickup: result.product.canPickup,
+      seller: {
+        user: {
+          name: result.product.seller.user.name
+        }
+      },
+      images: result.product.images.map(img => ({
+        url: img.url,
+        altText: img.altText
+      }))
+    }
+
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <CheckoutClient product={result.product} user={user} />
+        <CheckoutClient product={checkoutProduct} user={user} />
       </div>
     )
   }

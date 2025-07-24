@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from './auth'
+import { ProductActionResult, ProductWithRelations } from '@/lib/types/product'
 
 // Helper function to require seller access
 async function requireSeller() {
@@ -433,7 +434,7 @@ export async function getPublicProducts(params?: {
 }
 
 // Get product by ID for public view
-export async function getPublicProductById(productId: string) {
+export async function getPublicProductById(productId: string): Promise<ProductActionResult> {
   try {
     const product = await prisma.product.findUnique({
       where: {

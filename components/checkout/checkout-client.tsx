@@ -16,39 +16,31 @@ import Link from 'next/link'
 import { createOrder } from '@/lib/actions/orders'
 import { clearCart } from '@/lib/actions/cart'
 import { useRouter } from 'next/navigation'
+import { ProductWithRelations } from '@/lib/types/product'
+import { CartWithItems } from '@/lib/types/cart'
 
-interface Product {
+// Formatted product interface for checkout
+interface CheckoutProduct {
   id: string
   title: string
   price: number
-  shippingCost?: number
+  shippingCost: number | null
   canDeliver: boolean
   canPickup: boolean
   seller: {
     user: {
-      name: string
+      name: string | null
     }
   }
   images: Array<{
     url: string
-    altText?: string
+    altText: string | null
   }>
 }
 
-interface CartItem {
-  id: string
-  quantity: number
-  product: Product
-}
-
-interface Cart {
-  id: string
-  items: CartItem[]
-}
-
 interface CheckoutClientProps {
-  product?: Product
-  cart?: Cart
+  product?: CheckoutProduct
+  cart?: CartWithItems
   user: {
     id: string
     name?: string
